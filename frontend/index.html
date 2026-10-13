@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Analysis Studio</title>
+<meta name="description" content="A colourful statistics workbench: unlimited worksheet, hypothesis tests, regression, ANOVA, quality tools and more.">
+<meta name="theme-color" content="#17132E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 38'%3E%3Crect width='38' height='38' rx='11' fill='%236D4AFF'/%3E%3Crect x='8' y='20' width='5' height='10' rx='2' fill='%23FFB800'/%3E%3Crect x='16.5' y='13' width='5' height='17' rx='2' fill='%23fff'/%3E%3Crect x='25' y='8' width='5' height='22' rx='2' fill='%232EE6C8'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="root"></div>
+<template id="tpl"><div class="shell" style="height: {{appH}}">
+<div class="{{appCls}}">
+
+<nav class="rail" aria-label="Main">
+  <div class="brand">
+    <svg width="38" height="38" viewBox="0 0 38 38" aria-hidden="true"><rect width="38" height="38" rx="11" fill="#6D4AFF"></rect><rect x="8" y="20" width="5" height="10" rx="2" fill="#FFB800"></rect><rect x="16.5" y="13" width="5" height="17" rx="2" fill="#fff"></rect><rect x="25" y="8" width="5" height="22" rx="2" fill="#2EE6C8"></rect></svg>
+    <div><b>Analysis Studio</b><small>Stats workbench</small></div>
+  </div>
+  <button class="{{nav.home}}" onClick="{{go.home}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"></path></svg><span class="nl">Home</span></button>
+  <button class="{{nav.ws}}" onClick="{{go.ws}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18M3 15h18M9 3v18M15 3v18"></path></svg><span class="nl">Workspace</span></button>
+  <button class="{{nav.overview}}" onClick="{{go.overview}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5z"></path><path d="M3 13l9 5 9-5"></path></svg><span class="nl">Overview</span></button>
+  <button class="{{nav.dash}}" onClick="{{go.dash}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="8" height="10" rx="2"></rect><rect x="13" y="3" width="8" height="6" rx="2"></rect><rect x="13" y="11" width="8" height="10" rx="2"></rect><rect x="3" y="15" width="8" height="6" rx="2"></rect></svg><span class="nl">Dashboard</span></button>
+  <button class="{{nav.projects}}" onClick="{{go.projects}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg><span class="nl">Projects</span></button>
+  <button class="{{nav.settings}}" onClick="{{go.settings}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"></path><circle cx="16" cy="6" r="2"></circle><circle cx="10" cy="12" r="2"></circle><circle cx="18" cy="18" r="2"></circle></svg><span class="nl">Settings</span></button>
+  <div class="railfoot">
+    <span>Open project</span>
+    <b>{{cur.name}}</b>
+    <small style="color: #A9A3C9; font-size: 12px">{{cur.meta}}</small>
+    <small class="syncl"><i style="background: {{sync.color}}"></i>{{sync.text}}</small>
+    <div class="dots4"><i style="background: #6D4AFF"></i><i style="background: #2EE6C8"></i><i style="background: #FF5C5C"></i><i style="background: #FFB800"></i><i style="background: #1E8CFF"></i></div>
+  </div>
+</nav>
+
+<main class="main">
+
+<!-- HOME -->
+<sc-if value="{{is.home}}" hint-placeholder-val="{{true}}">
+<div class="page">
+  <section class="hero">
+    <div class="herocol">
+      <span class="pill" style="background: #FFB800; color: #17132E">Welcome back</span>
+      <h1 style="margin-top: 18px">Make your data <em>talk</em>. Loud and clear.</h1>
+      <p>A full statistics workbench — an unlimited worksheet, hypothesis tests, regression, ANOVA and quality control charts — in one colourful studio.</p>
+      <div class="herobtns">
+        <button class="btn sun" onClick="{{newProject}}">New project</button>
+        <button class="btn pri" onClick="{{go.ws}}">Open workspace</button>
+        <label class="btn" style="background: transparent; color: #fff; border-color: #4A4470">Import data<input class="vh" type="file" accept=".csv,text/csv,.txt,.xlsx,.xlsm" onChange="{{onFile}}"></label>
+      </div>
+    </div>
+    <div class="heroart" aria-hidden="true">
+      <div class="mini tilt1">
+        <header><span>Histogram</span><b style="background: #6D4AFF; color: #fff">Normal</b></header>
+        <svg viewBox="0 0 200 110" fill="none">
+          <path d="M10 100H190" stroke="#4A4470" stroke-width="1.5"></path>
+          <path d="M18 100V92H36V100ZM38 100V78H56V100ZM58 100V52H76V100ZM78 100V24H96V100ZM98 100V14H116V100ZM118 100V34H136V100ZM138 100V60H156V100ZM158 100V84H176V100Z" fill="#6D4AFF"></path>
+          <path d="M10 98C40 96 55 80 70 52S95 10 107 10S130 30 145 56S172 95 190 98" stroke="#FFB800" stroke-width="3" stroke-linecap="round"></path>
+        </svg>
+      </div>
+      <div class="mini tilt2">
+        <header><span>I chart</span><b style="background: #FF5C5C; color: #17132E">1 out</b></header>
+        <svg viewBox="0 0 200 110" fill="none">
+          <path d="M10 18H190M10 92H190" stroke="#FF5C5C" stroke-width="1.5" stroke-dasharray="5 4"></path>
+          <path d="M10 55H190" stroke="#C9C4E6" stroke-width="1.2" stroke-opacity=".6"></path>
+          <path d="M14 60L32 48L50 66L68 52L86 58L104 40L122 62L140 12L158 50L176 58L190 46" stroke="#2EE6C8" stroke-width="2.5" stroke-linejoin="round"></path>
+          <path d="M14 57a3 3 0 1 0 0.01 0ZM32 45a3 3 0 1 0 0.01 0ZM50 63a3 3 0 1 0 0.01 0ZM68 49a3 3 0 1 0 0.01 0ZM86 55a3 3 0 1 0 0.01 0ZM104 37a3 3 0 1 0 0.01 0ZM122 59a3 3 0 1 0 0.01 0ZM158 47a3 3 0 1 0 0.01 0ZM176 55a3 3 0 1 0 0.01 0ZM190 43a3 3 0 1 0 0.01 0Z" fill="#2EE6C8"></path>
+          <circle cx="140" cy="12" r="5" fill="#FF2E4D" stroke="#221D40" stroke-width="2"></circle>
+        </svg>
+      </div>
+      <div class="mini tilt2">
+        <header><span>Fitted line</span><b style="background: #1E8CFF; color: #fff">R² 87%</b></header>
+        <svg viewBox="0 0 200 110" fill="none">
+          <path d="M10 10V100H190" stroke="#4A4470" stroke-width="1.5"></path>
+          <path d="M18 92L186 16" stroke="#FFB800" stroke-width="3" stroke-linecap="round"></path>
+          <g fill="#1E8CFF">
+            <circle cx="24" cy="84" r="4"></circle><circle cx="36" cy="92" r="4"></circle><circle cx="48" cy="76" r="4"></circle><circle cx="60" cy="80" r="4"></circle>
+            <circle cx="72" cy="64" r="4"></circle><circle cx="84" cy="70" r="4"></circle><circle cx="96" cy="54" r="4"></circle><circle cx="108" cy="58" r="4"></circle>
+            <circle cx="120" cy="42" r="4"></circle><circle cx="132" cy="50" r="4"></circle><circle cx="146" cy="34" r="4"></circle><circle cx="160" cy="38" r="4"></circle>
+            <circle cx="172" cy="22" r="4"></circle><circle cx="182" cy="26" r="4"></circle>
+          </g>
+        </svg>
+      </div>
+      <div class="mini tilt1">
+        <header><span>Pareto</span><b style="background: #FFB800; color: #17132E">80 / 20</b></header>
+        <svg viewBox="0 0 200 110" fill="none">
+          <path d="M10 100H190" stroke="#4A4470" stroke-width="1.5"></path>
+          <path d="M16 100V20H42V100ZM46 100V48H72V100ZM76 100V64H102V100ZM106 100V76H132V100ZM136 100V84H162V100ZM166 100V90H186V100Z" fill="#FF5C5C"></path>
+          <path d="M29 62L59 40L89 26L119 17L149 11L176 8" stroke="#F3F1FF" stroke-width="2.5" stroke-linejoin="round"></path>
+          <g fill="#F3F1FF"><circle cx="29" cy="62" r="3.5"></circle><circle cx="59" cy="40" r="3.5"></circle><circle cx="89" cy="26" r="3.5"></circle><circle cx="119" cy="17" r="3.5"></circle><circle cx="149" cy="11" r="3.5"></circle><circle cx="176" cy="8" r="3.5"></circle></g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 14px">
+    <div class="row between"><h2 class="h2">Toolbox</h2><p class="sub">{{toolCount}} analyses ready to run</p></div>
+    <div class="mods">
+      <sc-for list="{{modules}}" as="m" hint-placeholder-count="5">
+        <button class="mod" style="background: {{m.color}}; color: {{m.ink}}" onClick="{{m.open}}">
+          <span class="cnt">{{m.count}}</span>
+          <div style="display: flex; flex-direction: column; gap: 6px"><b>{{m.name}}</b><span>{{m.blurb}}</span></div>
+        </button>
+      </sc-for>
+    </div>
+  </section>
+
+  <section class="dash2">
+    <div class="card">
+      <div class="row between"><h2 class="h2">Recent projects</h2><button class="btn sm ghost" onClick="{{go.projects}}">All projects</button></div>
+      <div class="list">
+        <sc-for list="{{recent}}" as="p" hint-placeholder-count="3">
+          <div class="li">
+            <span class="pill" style="background: {{p.color}}; color: #fff; min-width: 34px; justify-content: center">{{p.initial}}</span>
+            <div class="grow"><b>{{p.name}}</b><small>{{p.meta}}</small></div>
+            <button class="btn sm" onClick="{{p.open}}">Open</button>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div class="card">
+      <div class="row between"><h2 class="h2">Sample datasets</h2><span class="pill" style="background: #ECE7FF; color: #3A1FB0">Opens as new project</span></div>
+      <div class="list">
+        <sc-for list="{{samples}}" as="s" hint-placeholder-count="4">
+          <div class="li">
+            <span style="width: 14px; height: 40px; border-radius: 6px; background: {{s.color}}; flex: 0 0 auto"></span>
+            <div class="grow"><b>{{s.name}}</b><small>{{s.desc}}</small></div>
+            <button class="btn sm" onClick="{{s.load}}">Load</button>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+</div>
+</sc-if>
+
+<!-- WORKSPACE -->
+<sc-if value="{{is.ws}}" hint-placeholder-val="{{false}}">
+<div class="ws">
+  <div class="wshead">
+    <input class="pname" value="{{cur.name}}" onChange="{{renameCur}}" aria-label="Project name">
+    <div class="seg" role="group" aria-label="Layout">
+      <button class="{{splitCls.split}}" onClick="{{setSplit.split}}">Split</button>
+      <button class="{{splitCls.session}}" onClick="{{setSplit.session}}">Session</button>
+      <button class="{{splitCls.grid}}" onClick="{{setSplit.grid}}">Worksheet</button>
+    </div>
+    <label class="btn sm">Import data<input class="vh" type="file" accept=".csv,text/csv,.txt,.xlsx,.xlsm" onChange="{{onFile}}"></label>
+    <button class="btn sm" onClick="{{exportCsv}}">Export CSV</button>
+    <span class="syncpill" role="status"><i style="background: {{sync.color}}"></i>{{sync.short}}</span>
+  </div>
+  <div class="tabs" role="tablist" aria-label="Analysis menus">
+    <sc-for list="{{tabs}}" as="t" hint-placeholder-count="6">
+      <button class="{{t.cls}}" onClick="{{t.pick}}"><i style="background: {{t.color}}"></i>{{t.name}}</button>
+    </sc-for>
+  </div>
+  <div class="ribbon">
+    <sc-for list="{{tools}}" as="t" hint-placeholder-count="6">
+      <button class="tool" onClick="{{t.pick}}">
+        <span class="ic" style="background: {{t.color}}; color: {{t.ink}}">{{t.abbr}}</span>
+        <span><b>{{t.name}}</b><small>{{t.desc}}</small></span>
+      </button>
+    </sc-for>
+  </div>
+  <div class="split">
+    <section class="{{sessCls}}" aria-label="Session output">
+      <sc-if value="{{noOutputs}}" hint-placeholder-val="{{false}}">
+        <div class="empty">
+          <b>Session window</b>
+          <span>Pick a tool from the ribbon above. Tables, charts and verdicts land here — pin the good ones to your dashboard.</span>
+        </div>
+      </sc-if>
+      <sc-for list="{{outputs}}" as="o" hint-placeholder-count="1">
+        <article class="out">
+          <div class="outhead">
+            <span class="pill" style="background: {{o.color}}; color: {{o.ink}}">{{o.cat}}</span>
+            <h3>{{o.title}}</h3>
+            <time>{{o.time}}</time>
+            <button class="{{o.pinCls}}" onClick="{{o.pin}}" aria-label="Pin to dashboard"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 17v5M5 17h14l-2-4V5H7v8z"></path></svg></button>
+            <button class="iconbtn" onClick="{{o.remove}}" aria-label="Remove output"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+          </div>
+          <sc-if value="{{o.hasVerdict}}" hint-placeholder-val="{{false}}"><div class="{{o.verdictCls}}">{{o.verdict}}</div></sc-if>
+          <sc-for list="{{o.tables}}" as="tb" hint-placeholder-count="1">
+            <div class="tblwrap"><div class="tbl" style="grid-template-columns: repeat({{tb.n}}, auto)">
+              <sc-for list="{{tb.cells}}" as="cl" hint-placeholder-count="6"><div class="{{cl.cls}}">{{cl.t}}</div></sc-for>
+            </div></div>
+          </sc-for>
+          <sc-if value="{{o.hasCharts}}" hint-placeholder-val="{{false}}">
+          <div class="charts">
+            <sc-for list="{{o.charts}}" as="ch" hint-placeholder-count="1">
+              <div class="chartcard">
+                <h4>{{ch.title}}</h4>
+                <div class="chartbox">
+                  <svg viewBox="0 0 640 300" preserveAspectRatio="none" role="img" aria-label="{{ch.title}}">
+                    <path class="gridl" d="{{ch.grid}}"></path>
+                    <path d="{{ch.area}}" fill="{{ch.lc}}" fill-opacity="0.12"></path>
+                    <path d="{{ch.bars}}" fill="{{ch.bc}}" fill-opacity="0.9"></path>
+                    <path d="{{ch.bars2}}" fill="{{ch.b2c}}" fill-opacity="0.9"></path>
+                    <path d="{{ch.ref}}" stroke="#D93A40" stroke-width="1.6" stroke-dasharray="6 5" fill="none"></path>
+                    <path class="reftwo" d="{{ch.ref2}}"></path>
+                    <path d="{{ch.line}}" stroke="{{ch.lc}}" stroke-width="2.4" fill="none" stroke-linejoin="round" stroke-linecap="round"></path>
+                    <path d="{{ch.line2}}" stroke="{{ch.l2c}}" stroke-width="2.6" fill="none" stroke-linejoin="round" stroke-linecap="round"></path>
+                    <path d="{{ch.dots}}" fill="{{ch.dc}}" fill-opacity="0.9"></path>
+                    <path d="{{ch.dots2}}" fill="#FF2E4D"></path>
+                    <path class="axis" d="{{ch.axis}}"></path>
+                  </svg>
+                  <sc-for list="{{ch.labels}}" as="lb" hint-placeholder-count="4"><span class="{{lb.cls}}" style="left: {{lb.x}}%; top: {{lb.y}}%">{{lb.text}}</span></sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          </sc-if>
+          <div class="notes"><sc-for list="{{o.notes}}" as="nt" hint-placeholder-count="1"><p class="note">{{nt.t}}</p></sc-for></div>
+        </article>
+      </sc-for>
+    </section>
+    <section class="{{sheetCls}}" aria-label="Worksheet">
+      <div class="fbar">
+        <span class="ref">{{selRef}}</span>
+        <input class="fx" value="{{selVal}}" onChange="{{onBarChange}}" aria-label="Cell value" placeholder="Type a value, or paste a block from Excel into the grid">
+        <span class="pill" style="background: #ECE7FF; color: #3A1FB0">Unlimited grid · {{gridInfo}}</span>
+        <button class="btn sm ghost danger" onClick="{{clearSheet}}">Clear sheet</button>
+      </div>
+      <div class="gridwrap" onScroll="{{onGridScroll}}" onPaste="{{onPaste}}">
+        <div class="ghead" style="width: {{gridW}}px">
+          <div class="corner"></div>
+          <sc-for list="{{headCols}}" as="hc" hint-placeholder-count="10">
+            <div class="{{hc.cls}}">
+              <button class="hcid" onClick="{{hc.pick}}">{{hc.id}}</button>
+              <input class="hname" value="{{hc.name}}" data-c="{{hc.c}}" onChange="{{renameCol}}" placeholder="name" aria-label="{{hc.aria}}">
+            </div>
+          </sc-for>
+        </div>
+        <div style="height: {{padTop}}px"></div>
+        <sc-for list="{{gridRows}}" as="row" hint-placeholder-count="20">
+          <div class="grow-r" key="{{row.n}}" style="width: {{gridW}}px">
+            <div class="rn">{{row.n}}</div>
+            <sc-for list="{{row.cells}}" as="cell" hint-placeholder-count="10">
+              <input class="{{cell.cls}}" value="{{cell.v}}" data-r="{{cell.r}}" data-c="{{cell.c}}" onChange="{{onCell}}" onFocus="{{onCellFocus}}" onKeyDown="{{onCellKey}}" aria-label="{{cell.aria}}">
+            </sc-for>
+          </div>
+        </sc-for>
+        <div style="height: {{padBot}}px"></div>
+      </div>
+    </section>
+  </div>
+</div>
+</sc-if>
+
+<!-- OVERVIEW -->
+<sc-if value="{{is.overview}}" hint-placeholder-val="{{false}}">
+<div class="page">
+  <div class="row between">
+    <div><h1 class="h1">Data overview</h1><p class="sub">Every column in <b>{{cur.name}}</b>, profiled at a glance.</p></div>
+    <button class="btn pri" onClick="{{go.ws}}">Open worksheet</button>
+  </div>
+  <div class="kpis">
+    <div class="kpi" style="background: #6D4AFF; color: #fff"><span>Columns in use</span><b>{{ov.cols}}</b><small>{{ov.numCols}} numeric · {{ov.txtCols}} text</small></div>
+    <div class="kpi" style="background: #FFB800; color: #17132E"><span>Rows</span><b>{{ov.rows}}</b><small>longest column</small></div>
+    <div class="kpi" style="background: #00857C; color: #fff"><span>Numeric cells</span><b>{{ov.cells}}</b><small>ready for analysis</small></div>
+    <div class="kpi" style="background: #D93A40; color: #fff"><span>Missing / text</span><b>{{ov.missing}}</b><small>blank or non-numeric in numeric columns</small></div>
+  </div>
+  <sc-if value="{{ov.none}}" hint-placeholder-val="{{false}}">
+    <div class="empty"><b>No data yet</b><span>Type or paste into the worksheet, import a CSV, or load a sample dataset.</span><button class="btn pri" onClick="{{go.ws}}">Go to worksheet</button></div>
+  </sc-if>
+  <div class="colgrid">
+    <sc-for list="{{ov.list}}" as="c" hint-placeholder-count="4">
+      <article class="colcard">
+        <div style="height: 8px; background: {{c.color}}"></div>
+        <header><b>{{c.name}}</b><span class="pill" style="background: {{c.badgeBg}}; color: {{c.badgeInk}}">{{c.type}}</span></header>
+        <div class="minih" aria-hidden="true">
+          <sc-for list="{{c.hist}}" as="h" hint-placeholder-count="12"><div style="height: {{h.h}}%; background: {{c.color}}"></div></sc-for>
+        </div>
+        <div class="stats">
+          <sc-for list="{{c.stats}}" as="s" hint-placeholder-count="6"><div><span>{{s.k}}</span><b>{{s.v}}</b></div></sc-for>
+        </div>
+      </article>
+    </sc-for>
+  </div>
+</div>
+</sc-if>
+
+<!-- DASHBOARD -->
+<sc-if value="{{is.dash}}" hint-placeholder-val="{{false}}">
+<div class="page">
+  <div class="row between">
+    <div><h1 class="h1">Dashboard</h1><p class="sub">Your pinned results and studio activity across all projects.</p></div>
+    <button class="btn pri" onClick="{{go.ws}}">Run an analysis</button>
+  </div>
+  <div class="kpis">
+    <div class="kpi" style="background: #17132E; color: #fff"><span>Projects</span><b>{{db.projects}}</b><small>in this studio</small></div>
+    <div class="kpi" style="background: #6D4AFF; color: #fff"><span>Analyses run</span><b>{{db.runs}}</b><small>across all projects</small></div>
+    <div class="kpi" style="background: #FFB800; color: #17132E"><span>Pinned</span><b>{{db.pinned}}</b><small>results on this board</small></div>
+    <div class="kpi" style="background: #00857C; color: #fff"><span>Latest Cpk</span><b>{{db.cpk}}</b><small>{{db.cpkNote}}</small></div>
+  </div>
+  <div class="dash2">
+    <div class="card">
+      <h2 class="h2">Toolbox usage</h2>
+      <div class="bars">
+        <sc-for list="{{db.usage}}" as="u" hint-placeholder-count="5">
+          <div class="barrow"><span>{{u.name}}</span><div class="bartrack"><div style="width: {{u.w}}%; background: {{u.color}}"></div></div><span class="mono" style="text-align: right">{{u.n}}</span></div>
+        </sc-for>
+      </div>
+    </div>
+    <div class="card">
+      <h2 class="h2">Recent activity</h2>
+      <div class="list">
+        <sc-if value="{{db.noActivity}}" hint-placeholder-val="{{false}}"><p class="sub">Nothing run yet.</p></sc-if>
+        <sc-for list="{{db.activity}}" as="a" hint-placeholder-count="4">
+          <div class="li"><span class="pill" style="background: {{a.color}}; color: {{a.ink}}">{{a.cat}}</span><div class="grow"><b>{{a.title}}</b><small>{{a.project}} · {{a.time}}</small></div></div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+  <h2 class="h2">Pinned results</h2>
+  <sc-if value="{{db.noPins}}" hint-placeholder-val="{{false}}">
+    <div class="empty"><b>Nothing pinned yet</b><span>Run an analysis in the workspace and hit the pin on any result to put it here.</span></div>
+  </sc-if>
+  <div class="pinned">
+    <sc-for list="{{db.pins}}" as="o" hint-placeholder-count="2">
+      <article class="out">
+        <div class="outhead">
+          <span class="pill" style="background: {{o.color}}; color: {{o.ink}}">{{o.cat}}</span>
+          <h3>{{o.title}}</h3>
+          <button class="iconbtn on" onClick="{{o.pin}}" aria-label="Unpin"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 17v5M5 17h14l-2-4V5H7v8z"></path></svg></button>
+        </div>
+        <small class="sub" style="font-size: 12.5px">{{o.project}} · {{o.time}}</small>
+        <sc-if value="{{o.hasVerdict}}" hint-placeholder-val="{{false}}"><div class="{{o.verdictCls}}">{{o.verdict}}</div></sc-if>
+        <sc-for list="{{o.charts}}" as="ch" hint-placeholder-count="1">
+          <div class="chartcard">
+            <h4>{{ch.title}}</h4>
+            <div class="chartbox">
+              <svg viewBox="0 0 640 300" preserveAspectRatio="none" role="img" aria-label="{{ch.title}}">
+                <path class="gridl" d="{{ch.grid}}"></path>
+                <path d="{{ch.area}}" fill="{{ch.lc}}" fill-opacity="0.12"></path>
+                <path d="{{ch.bars}}" fill="{{ch.bc}}" fill-opacity="0.9"></path>
+                <path d="{{ch.bars2}}" fill="{{ch.b2c}}" fill-opacity="0.9"></path>
+                <path d="{{ch.ref}}" stroke="#D93A40" stroke-width="1.6" stroke-dasharray="6 5" fill="none"></path>
+                <path class="reftwo" d="{{ch.ref2}}"></path>
+                <path d="{{ch.line}}" stroke="{{ch.lc}}" stroke-width="2.4" fill="none" stroke-linejoin="round" stroke-linecap="round"></path>
+                <path d="{{ch.line2}}" stroke="{{ch.l2c}}" stroke-width="2.6" fill="none" stroke-linejoin="round" stroke-linecap="round"></path>
+                <path d="{{ch.dots}}" fill="{{ch.dc}}" fill-opacity="0.9"></path>
+                <path d="{{ch.dots2}}" fill="#FF2E4D"></path>
+                <path class="axis" d="{{ch.axis}}"></path>
+              </svg>
+              <sc-for list="{{ch.labels}}" as="lb" hint-placeholder-count="4"><span class="{{lb.cls}}" style="left: {{lb.x}}%; top: {{lb.y}}%">{{lb.text}}</span></sc-for>
+            </div>
+          </div>
+        </sc-for>
+        <sc-for list="{{o.tables}}" as="tb" hint-placeholder-count="1">
+          <div class="tblwrap"><div class="tbl" style="grid-template-columns: repeat({{tb.n}}, auto)">
+            <sc-for list="{{tb.cells}}" as="cl" hint-placeholder-count="6"><div class="{{cl.cls}}">{{cl.t}}</div></sc-for>
+          </div></div>
+        </sc-for>
+      </article>
+    </sc-for>
+  </div>
+</div>
+</sc-if>
+
+<!-- PROJECTS -->
+<sc-if value="{{is.projects}}" hint-placeholder-val="{{false}}">
+<div class="page">
+  <div class="row between">
+    <div><h1 class="h1">Projects</h1><p class="sub">Signed in, projects and worksheets sync to every device. Session results stay on the device that ran them.</p></div>
+    <div class="row">
+      <label class="btn">Import data<input class="vh" type="file" accept=".csv,text/csv,.txt,.xlsx,.xlsm" onChange="{{onFile}}"></label>
+      <button class="btn pri" onClick="{{newProject}}">New project</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="list">
+      <sc-for list="{{plist}}" as="p" hint-placeholder-count="3">
+        <div class="li">
+          <span class="pill" style="background: {{p.color}}; color: #fff; min-width: 34px; justify-content: center">{{p.initial}}</span>
+          <div class="grow"><input class="renamer" value="{{p.name}}" onChange="{{p.rename}}" aria-label="Project name"><small style="padding-left: 8px">{{p.meta}}</small></div>
+          <sc-if value="{{p.isCur}}" hint-placeholder-val="{{false}}"><span class="pill" style="background: #DDF7EF; color: #05584F">Open</span></sc-if>
+          <button class="btn sm pri" onClick="{{p.open}}">Open</button>
+          <button class="btn sm" onClick="{{p.dup}}">Duplicate</button>
+          <button class="btn sm ghost danger" onClick="{{p.del}}">Delete</button>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<!-- SETTINGS -->
+<sc-if value="{{is.settings}}" hint-placeholder-val="{{false}}">
+<div class="page">
+  <div><h1 class="h1">Settings</h1><p class="sub">Tune how the studio looks and how results are reported.</p></div>
+  <div class="settings">
+    <div class="card field"><b>Theme</b><p class="sub">Daylight for the office, Midnight for late labs.</p>
+      <div class="seg" role="group" aria-label="Theme"><button class="{{set.day}}" onClick="{{set.setDay}}">Daylight</button><button class="{{set.night}}" onClick="{{set.setNight}}">Midnight</button></div></div>
+    <div class="card field"><b>Decimal places</b><p class="sub">Used in every output table.</p>
+      <div class="seg" role="group" aria-label="Decimal places"><sc-for list="{{set.decs}}" as="d" hint-placeholder-count="5"><button class="{{d.cls}}" onClick="{{d.pick}}">{{d.label}}</button></sc-for></div></div>
+    <div class="card field"><b>Significance level (α)</b><p class="sub">Verdicts compare p-values to this.</p>
+      <div class="seg" role="group" aria-label="Significance level"><sc-for list="{{set.alphas}}" as="d" hint-placeholder-count="3"><button class="{{d.cls}}" onClick="{{d.pick}}">{{d.label}}</button></sc-for></div></div>
+    <div class="card field"><b>Account</b><p class="sub">{{acct.line}}</p>
+      <div class="row"><sc-if value="{{acct.signedIn}}" hint-placeholder-val="{{false}}"><button class="btn" onClick="{{acct.signOut}}">Sign out</button></sc-if><sc-if value="{{acct.canSignIn}}" hint-placeholder-val="{{false}}"><button class="btn pri" onClick="{{acct.signIn}}">Sign in to sync</button></sc-if></div></div>
+    <div class="card field"><b>Sync across devices</b><p class="sub">Projects and worksheets follow your account. Session results and these settings stay on each device.</p>
+      <div><span class="pill" style="background: {{sync.color}}; color: #17132E">{{sync.text}}</span></div></div>
+    <div class="card field"><b>Analysis server</b><p class="sub">Runs worksheets over {{srv.big}} rows, the Advanced tests and Excel import.</p>
+      <div><span class="pill" style="background: {{srv.color}}; color: #17132E">{{srv.text}}</span></div></div>
+    <div class="card field"><b>Scheduled reports</b><p class="sub">Email a PDF of your pinned results.</p>
+      <sc-if value="{{rep.enabled}}" hint-placeholder-val="{{false}}">
+        <label class="slot"><span class="lbl">Send to</span><input class="opt" type="email" autocomplete="email" value="{{rep.email}}" onChange="{{rep.setEmail}}" placeholder="you@example.com"></label>
+        <div class="seg" role="group" aria-label="Report frequency"><sc-for list="{{rep.freqs}}" as="d" hint-placeholder-count="3"><button class="{{d.cls}}" onClick="{{d.pick}}">{{d.label}}</button></sc-for></div>
+        <div class="row"><button class="btn pri sm" onClick="{{rep.save}}">Save schedule</button><button class="btn sm" onClick="{{rep.test}}">{{rep.testLabel}}</button></div>
+      </sc-if>
+      <sc-if value="{{rep.disabled}}" hint-placeholder-val="{{false}}"><p class="sub" style="font-weight: 700">{{rep.why}}</p></sc-if></div>
+    <div class="card field"><b>Clear this device</b><p class="sub">Removes this device’s saved copy and its local results. Synced projects come back after you sign in.</p>
+      <div><button class="btn danger" onClick="{{resetAll}}">Clear this device</button></div></div>
+  </div>
+</div>
+</sc-if>
+
+</main>
+
+<sc-if value="{{dlg.open}}" hint-placeholder-val="{{false}}">
+<div class="scrim">
+  <div class="dlg" role="dialog" aria-modal="true" aria-label="{{dlg.name}}">
+    <div class="dlghead">
+      <span class="pill" style="background: {{dlg.color}}; color: {{dlg.ink}}; align-self: flex-start">{{dlg.cat}}</span>
+      <h2>{{dlg.name}}</h2>
+      <p class="sub">{{dlg.desc}}</p>
+    </div>
+    <div class="dlgbody">
+      <sc-if value="{{dlg.noCols}}" hint-placeholder-val="{{false}}"><div class="verdict bad">The worksheet has no columns with data yet. Add data or load a sample first.</div></sc-if>
+      <sc-for list="{{dlg.slots}}" as="s" hint-placeholder-count="1">
+        <div class="slot">
+          <span class="lbl">{{s.label}}<span class="hint">{{s.hint}}</span></span>
+          <div class="chips"><sc-for list="{{s.chips}}" as="c" hint-placeholder-count="4"><button class="{{c.cls}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for></div>
+        </div>
+      </sc-for>
+      <div class="opts">
+        <sc-for list="{{dlg.opts}}" as="o" hint-placeholder-count="1">
+          <div class="slot"><label>{{o.label}}<input class="opt" value="{{o.v}}" onChange="{{o.change}}" placeholder="{{o.ph}}"></label></div>
+        </sc-for>
+      </div>
+    </div>
+    <div class="dlgfoot">
+      <button class="btn" onClick="{{dlg.close}}">Cancel</button>
+      <button class="btn pri" onClick="{{dlg.run}}">{{dlg.runLabel}}</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{auth.show}}" hint-placeholder-val="{{false}}">
+<div class="scrim authscrim">
+  <div class="dlg" style="max-width: 440px" role="dialog" aria-modal="true" aria-label="Sign in">
+    <div class="dlghead"><svg width="44" height="44" viewBox="0 0 38 38" aria-hidden="true"><rect width="38" height="38" rx="11" fill="#6D4AFF"></rect><rect x="8" y="20" width="5" height="10" rx="2" fill="#FFB800"></rect><rect x="16.5" y="13" width="5" height="17" rx="2" fill="#fff"></rect><rect x="25" y="8" width="5" height="22" rx="2" fill="#2EE6C8"></rect></svg>
+      <h2>{{auth.title}}</h2>
+      <p class="sub">Your projects and worksheets sync to every device you sign in on.</p>
+    </div>
+    <form class="dlgbody authform" onSubmit="{{auth.submit}}">
+      <label class="slot"><span class="lbl">Email</span><input class="opt" type="email" autocomplete="email" value="{{auth.email}}" onChange="{{auth.setEmail}}" placeholder="you@example.com"></label>
+      <label class="slot"><span class="lbl">Password</span><input class="opt" type="password" autocomplete="{{auth.passAuto}}" value="{{auth.pass}}" onChange="{{auth.setPass}}" placeholder="At least 6 characters"></label>
+      <sc-if value="{{auth.hasMsg}}" hint-placeholder-val="{{false}}"><div class="{{auth.msgCls}}">{{auth.msg}}</div></sc-if>
+      <button class="btn pri" type="submit">{{auth.submitLabel}}</button>
+      <button class="btn" type="button" onClick="{{auth.magic}}">Email me a sign-in link instead</button>
+      <div class="row between"><button class="btn sm ghost" type="button" onClick="{{auth.toggle}}">{{auth.toggleLabel}}</button><button class="btn sm ghost" type="button" onClick="{{auth.skip}}">Continue without account</button></div>
+    </form>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{toast.show}}" hint-placeholder-val="{{false}}"><div class="toast" role="status"><i></i>{{toast.text}}</div></sc-if>
+
+</div>
+</div></template>
+<script src="https://cdn.jsdelivr.net/npm/preact@10.19.3/dist/preact.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script src="runtime.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

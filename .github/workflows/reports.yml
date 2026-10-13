@@ -1,0 +1,22 @@
+name: Scheduled reports
+
+# Once a day: wake the Render server, then send every report that is due.
+# 01:00 UTC = 09:00 in Malaysia, 10:00 in Korea.
+on:
+  schedule:
+    - cron: "0 1 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Send due reports
+        env:
+          API_URL: ${{ secrets.API_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$API_URL" ] || [ -z "$CRON_SECRET" ]; then echo "Add the API_URL and CRON_SECRET repository secrets first."; exit 1; fi
+          for i in 1 2 3 4 5 6 7 8; do curl -fsS "$API_URL/health" > /dev/null && break; echo "waiting for server..."; sleep 15; done
+          curl -fsS -X POST "$API_URL/reports/run" -H "X-Cron-Secret: $CRON_SECRET"
